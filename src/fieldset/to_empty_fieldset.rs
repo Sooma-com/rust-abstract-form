@@ -1,4 +1,4 @@
-use crate::{field, Field, FieldSet};
+use crate::{Field, FieldSet, field};
 
 pub trait ToEmptyFieldSet {
     fn to_empty_fieldset() -> FieldSet;
@@ -53,6 +53,12 @@ macro_rules! impl_to_empty_fieldset_for_numeric {
 }
 
 impl_to_empty_fieldset_for_numeric!(i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, isize, usize);
+
+impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for Option<INNER> {
+    fn to_empty_fieldset() -> FieldSet {
+        INNER::to_empty_fieldset()
+    }
+}
 
 #[cfg(feature = "chrono")]
 impl ToEmptyFieldSet for chrono::NaiveDate {
