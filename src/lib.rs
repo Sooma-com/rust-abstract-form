@@ -56,6 +56,31 @@ mod tests {
         address: Address,
     }
 
+    #[derive(ToEmptyFieldSet)]
+    struct WithSkipped {
+        name: String,
+        #[abstract_form(skip)]
+        id: i32,
+        active: bool,
+    }
+
+    #[test]
+    fn test_skip_attribute_excludes_field() {
+        let fieldset = WithSkipped::to_empty_fieldset();
+
+        assert_eq!(fieldset.tag, "WithSkipped");
+        assert_eq!(fieldset.controls.len(), 2);
+
+        assert_eq!(
+            fieldset.controls[0],
+            Field::Text(field::Text::new("name".to_string(), "".to_string(), "".to_string()))
+        );
+        assert_eq!(
+            fieldset.controls[1],
+            Field::Boolean(field::Boolean::new("active".to_string(), "".to_string(), false))
+        );
+    }
+
     #[test]
     fn test_nested_struct_tag_composition() {
         let fieldset = Company::to_empty_fieldset();
