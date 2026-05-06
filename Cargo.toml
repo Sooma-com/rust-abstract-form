@@ -1,0 +1,13 @@
+[package]
+name = "abstract_form"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+chrono = ["dep:chrono"]
+
+[dependencies]
+chrono = { version = "0.4", optional = true }
+
+[dev-dependencies]
+abstract_form_derive = { path = "../abstract_form_derive" }
