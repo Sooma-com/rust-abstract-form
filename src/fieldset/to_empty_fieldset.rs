@@ -59,6 +59,31 @@ impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for Option<INNER> {
         INNER::to_empty_fieldset()
     }
 }
+impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for Box<INNER> {
+    fn to_empty_fieldset() -> FieldSet {
+        INNER::to_empty_fieldset()
+    }
+}
+impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::rc::Rc<INNER> {
+    fn to_empty_fieldset() -> FieldSet {
+        INNER::to_empty_fieldset()
+    }
+}
+impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::sync::Arc<INNER> {
+    fn to_empty_fieldset() -> FieldSet {
+        INNER::to_empty_fieldset()
+    }
+}
+impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::cell::Cell<INNER> {
+    fn to_empty_fieldset() -> FieldSet {
+        INNER::to_empty_fieldset()
+    }
+}
+impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::cell::RefCell<INNER> {
+    fn to_empty_fieldset() -> FieldSet {
+        INNER::to_empty_fieldset()
+    }
+}
 
 #[cfg(feature = "chrono")]
 impl ToEmptyFieldSet for chrono::NaiveDate {
