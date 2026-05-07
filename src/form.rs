@@ -1,4 +1,4 @@
-use crate::{Field, FieldSet};
+use crate::{Field, FieldSet, errors::Error};
 
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct Form {
@@ -15,5 +15,36 @@ impl Form {
         }
         self.fieldsets[0].controls.push(control);
         self
+    }
+    pub fn field_iter(&self) -> impl Iterator<Item = &Field> {
+        self.fieldsets
+            .iter()
+            .flat_map(|fieldset| fieldset.field_iter())
+    }
+    pub fn field_iter_mut(&mut self) -> impl Iterator<Item = &mut Field> {
+        self.fieldsets
+            .iter_mut()
+            .flat_map(|fieldset| fieldset.field_iter_mut())
+    }
+    pub fn set_value(&mut self, key: &str, value: &str) -> Result<(), Error> {
+        for field in self.field_iter_mut() {
+            if field.get_tag() == key {
+                field.set_value_from_string(value)?;
+                return Ok(());
+            }
+        }
+        return Err(Error::FieldNotFound {
+            msg: key.to_string(),
+        });
+    }
+    pub fn get_value(&self, key: &str) -> Result<String, Error> {
+        for field in self.field_iter() {
+            if field.get_tag() == key {
+                return Ok(field.get_value_as_string());
+            }
+        }
+        return Err(Error::FieldNotFound {
+            msg: key.to_string(),
+        });
     }
 }

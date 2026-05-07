@@ -1,3 +1,4 @@
+pub mod errors;
 pub mod form;
 pub use form::Form;
 pub mod fieldset;
@@ -32,7 +33,11 @@ mod tests {
 
         assert_eq!(
             fieldset.controls[0],
-            Field::Text(field::Text::new("name".to_string(), "".to_string(), "".to_string()))
+            Field::Text(field::Text::new(
+                "name".to_string(),
+                "".to_string(),
+                "".to_string()
+            ))
         );
         assert_eq!(
             fieldset.controls[1],
@@ -40,7 +45,11 @@ mod tests {
         );
         assert_eq!(
             fieldset.controls[2],
-            Field::Boolean(field::Boolean::new("active".to_string(), "".to_string(), false))
+            Field::Boolean(field::Boolean::new(
+                "active".to_string(),
+                "".to_string(),
+                false
+            ))
         );
     }
 
@@ -73,11 +82,19 @@ mod tests {
 
         assert_eq!(
             fieldset.controls[0],
-            Field::Text(field::Text::new("name".to_string(), "".to_string(), "".to_string()))
+            Field::Text(field::Text::new(
+                "name".to_string(),
+                "".to_string(),
+                "".to_string()
+            ))
         );
         assert_eq!(
             fieldset.controls[1],
-            Field::Boolean(field::Boolean::new("active".to_string(), "".to_string(), false))
+            Field::Boolean(field::Boolean::new(
+                "active".to_string(),
+                "".to_string(),
+                false
+            ))
         );
     }
 
@@ -90,15 +107,27 @@ mod tests {
 
         assert_eq!(
             fieldset.controls[0],
-            Field::Text(field::Text::new("name".to_string(), "".to_string(), "".to_string()))
+            Field::Text(field::Text::new(
+                "name".to_string(),
+                "".to_string(),
+                "".to_string()
+            ))
         );
         assert_eq!(
             fieldset.controls[1],
-            Field::Text(field::Text::new("address.Address.street".to_string(), "".to_string(), "".to_string()))
+            Field::Text(field::Text::new(
+                "address.Address.street".to_string(),
+                "".to_string(),
+                "".to_string()
+            ))
         );
         assert_eq!(
             fieldset.controls[2],
-            Field::Text(field::Text::new("address.Address.postal_code".to_string(), "".to_string(), "".to_string()))
+            Field::Text(field::Text::new(
+                "address.Address.postal_code".to_string(),
+                "".to_string(),
+                "".to_string()
+            ))
         );
     }
 }
