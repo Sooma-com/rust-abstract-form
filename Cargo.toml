@@ -11,7 +11,7 @@ backtrace = { version = "0.3.76", features = ["default", "unix-backtrace"] }
 chrono = { version = "0.4", optional = true }
 error_context = { path = "../error_context" }
 itertools = "0.14.0"
-snafu = "0.9.X"
+snafu = "0.9.*"
 
 [dev-dependencies]
 abstract_form_derive = { path = "../abstract_form_derive" }
