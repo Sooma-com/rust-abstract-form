@@ -50,7 +50,7 @@ impl Field {
         if current_tag.is_empty() {
             current_tag = tag.to_string();
         } else {
-            current_tag.insert_str(0, ".");
+            current_tag.insert(0, '.');
             current_tag.insert_str(0, tag);
         }
         match self {
@@ -74,13 +74,14 @@ impl Field {
         }
     }
     pub fn set_value_from_string(&mut self, value: &str) -> Result<(), Error> {
-        Ok(match self {
+        match self {
             Field::Text(text) => text.value = value.to_string(),
             Field::Number(number) => number.value = value.parse::<f64>()?,
             Field::Date(date) => date.value = value.to_string(),
             Field::Time(time) => time.value = value.to_string(),
             Field::DateTime(date_time) => date_time.value = value.to_string(),
             Field::Boolean(boolean) => boolean.value = value.parse::<bool>()?,
-        })
+        };
+        Ok(())
     }
 }

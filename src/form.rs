@@ -33,9 +33,9 @@ impl Form {
                 return Ok(());
             }
         }
-        return Err(Error::FieldNotFound {
+        Err(Error::FieldNotFound {
             msg: key.to_string(),
-        });
+        })
     }
     pub fn get_value(&self, key: &str) -> Result<String, Error> {
         for field in self.field_iter() {
@@ -43,8 +43,8 @@ impl Form {
                 return Ok(field.get_value_as_string());
             }
         }
-        return Err(Error::FieldNotFound {
+        Err(Error::FieldNotFound {
             msg: key.to_string(),
-        });
+        })
     }
 }
