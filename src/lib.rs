@@ -20,6 +20,7 @@ mod tests {
     use fieldset::ToFieldSet as _;
 
     #[derive(ToEmptyFieldSet)]
+    #[allow(dead_code)]
     struct UserProfile {
         name: String,
         age: i32,
@@ -57,18 +58,21 @@ mod tests {
     }
 
     #[derive(ToEmptyFieldSet)]
+    #[allow(dead_code)]
     struct Address {
         street: String,
         postal_code: String,
     }
 
     #[derive(ToEmptyFieldSet)]
+    #[allow(dead_code)]
     struct Company {
         name: String,
         address: Address,
     }
 
     #[derive(ToEmptyFieldSet)]
+    #[allow(dead_code)]
     struct WithSkipped {
         name: String,
         #[abstract_form(skip)]
@@ -177,6 +181,7 @@ mod tests {
     }
 
     #[derive(ToFieldSet)]
+    #[allow(dead_code)]
     struct WithSkippedFieldSet {
         name: String,
         #[abstract_form(skip)]
@@ -251,20 +256,24 @@ mod tests {
 
         let validations = fieldset.controls[0].get_validations();
         assert_eq!(validations.len(), 1);
-        assert!(validations[0]
-            .validate(&Field::Text(field::Text::new(
-                "".to_string(),
-                "".to_string(),
-                "red".to_string(),
-            )))
-            .is_ok());
-        assert!(validations[0]
-            .validate(&Field::Text(field::Text::new(
-                "".to_string(),
-                "".to_string(),
-                "invalid".to_string(),
-            )))
-            .is_err());
+        assert!(
+            validations[0]
+                .validate(&Field::Text(field::Text::new(
+                    "".to_string(),
+                    "".to_string(),
+                    "red".to_string(),
+                )))
+                .is_ok()
+        );
+        assert!(
+            validations[0]
+                .validate(&Field::Text(field::Text::new(
+                    "".to_string(),
+                    "".to_string(),
+                    "invalid".to_string(),
+                )))
+                .is_err()
+        );
     }
 
     #[test]
@@ -285,20 +294,24 @@ mod tests {
 
         let validations = fieldset.controls[0].get_validations();
         assert_eq!(validations.len(), 1);
-        assert!(validations[0]
-            .validate(&Field::Text(field::Text::new(
-                "".to_string(),
-                "".to_string(),
-                "blue".to_string(),
-            )))
-            .is_ok());
-        assert!(validations[0]
-            .validate(&Field::Text(field::Text::new(
-                "".to_string(),
-                "".to_string(),
-                "yellow".to_string(),
-            )))
-            .is_err());
+        assert!(
+            validations[0]
+                .validate(&Field::Text(field::Text::new(
+                    "".to_string(),
+                    "".to_string(),
+                    "blue".to_string(),
+                )))
+                .is_ok()
+        );
+        assert!(
+            validations[0]
+                .validate(&Field::Text(field::Text::new(
+                    "".to_string(),
+                    "".to_string(),
+                    "yellow".to_string(),
+                )))
+                .is_err()
+        );
     }
 
     #[derive(ToEmptyFieldSet, ToFieldSet)]
