@@ -52,9 +52,10 @@ macro_rules! impl_validation_for_numeric {
         )*
     };
 }
+impl_validation_for_string!(ClosedSingleChoice, String);
+#[cfg(feature = "chrono")]
 impl_validation_for_string!(
     ClosedSingleChoice,
-    String,
     chrono::NaiveDate,
     chrono::NaiveTime,
     chrono::NaiveDateTime

@@ -213,4 +213,157 @@ mod tests {
             ))
         );
     }
+
+    #[derive(
+        Debug, Clone, Copy, PartialEq, Eq, Default, strum::EnumIter, ToEmptyFieldSet, ToFieldSet,
+    )]
+    enum Color {
+        #[default]
+        Red,
+        Green,
+        Blue,
+    }
+    impl std::fmt::Display for Color {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::Red => write!(f, "red"),
+                Self::Green => write!(f, "green"),
+                Self::Blue => write!(f, "blue"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_enum_to_empty_fieldset() {
+        let fieldset = Color::to_empty_fieldset();
+
+        assert_eq!(fieldset.tag, "Color");
+        assert_eq!(fieldset.controls.len(), 1);
+
+        assert_eq!(
+            fieldset.controls[0],
+            Field::Text(field::Text::new(
+                "".to_string(),
+                "".to_string(),
+                "".to_string(),
+            ))
+        );
+
+        let validations = fieldset.controls[0].get_validations();
+        assert_eq!(validations.len(), 1);
+        assert!(validations[0]
+            .validate(&Field::Text(field::Text::new(
+                "".to_string(),
+                "".to_string(),
+                "red".to_string(),
+            )))
+            .is_ok());
+        assert!(validations[0]
+            .validate(&Field::Text(field::Text::new(
+                "".to_string(),
+                "".to_string(),
+                "invalid".to_string(),
+            )))
+            .is_err());
+    }
+
+    #[test]
+    fn test_enum_to_field_set() {
+        let fieldset = Color::Green.to_field_set();
+
+        assert_eq!(fieldset.tag, "Color");
+        assert_eq!(fieldset.controls.len(), 1);
+
+        assert_eq!(
+            fieldset.controls[0],
+            Field::Text(field::Text::new(
+                "".to_string(),
+                "".to_string(),
+                "green".to_string(),
+            ))
+        );
+
+        let validations = fieldset.controls[0].get_validations();
+        assert_eq!(validations.len(), 1);
+        assert!(validations[0]
+            .validate(&Field::Text(field::Text::new(
+                "".to_string(),
+                "".to_string(),
+                "blue".to_string(),
+            )))
+            .is_ok());
+        assert!(validations[0]
+            .validate(&Field::Text(field::Text::new(
+                "".to_string(),
+                "".to_string(),
+                "yellow".to_string(),
+            )))
+            .is_err());
+    }
+
+    #[derive(ToEmptyFieldSet, ToFieldSet)]
+    struct WithEnum {
+        name: String,
+        color: Color,
+    }
+
+    #[test]
+    fn test_struct_with_enum_field_to_empty_fieldset() {
+        let fieldset = WithEnum::to_empty_fieldset();
+
+        assert_eq!(fieldset.tag, "WithEnum");
+        assert_eq!(fieldset.controls.len(), 2);
+
+        assert_eq!(
+            fieldset.controls[0],
+            Field::Text(field::Text::new(
+                "name".to_string(),
+                "".to_string(),
+                "".to_string(),
+            ))
+        );
+        assert_eq!(
+            fieldset.controls[1],
+            Field::Text(field::Text::new(
+                "color.Color".to_string(),
+                "".to_string(),
+                "".to_string(),
+            ))
+        );
+
+        let validations = fieldset.controls[1].get_validations();
+        assert_eq!(validations.len(), 1);
+    }
+
+    #[test]
+    fn test_struct_with_enum_field_to_field_set() {
+        let item = WithEnum {
+            name: "Alice".to_string(),
+            color: Color::Blue,
+        };
+        let fieldset = item.to_field_set();
+
+        assert_eq!(fieldset.tag, "WithEnum");
+        assert_eq!(fieldset.controls.len(), 2);
+
+        assert_eq!(
+            fieldset.controls[0],
+            Field::Text(field::Text::new(
+                "name".to_string(),
+                "".to_string(),
+                "Alice".to_string(),
+            ))
+        );
+        assert_eq!(
+            fieldset.controls[1],
+            Field::Text(field::Text::new(
+                "color.Color".to_string(),
+                "".to_string(),
+                "blue".to_string(),
+            ))
+        );
+
+        let validations = fieldset.controls[1].get_validations();
+        assert_eq!(validations.len(), 1);
+    }
 }
