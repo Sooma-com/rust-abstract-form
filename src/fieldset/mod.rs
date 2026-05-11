@@ -4,7 +4,7 @@ pub use to_empty_fieldset::ToEmptyFieldSet;
 pub mod to_field_set;
 pub use to_field_set::ToFieldSet;
 
-#[derive(Default, Clone, Debug, PartialEq)]
+#[derive(Default, Clone, Debug)]
 pub struct FieldSet {
     pub tag: String,
     pub label: String,

@@ -1,6 +1,6 @@
 use crate::{Field, FieldSet, errors::Error};
 
-#[derive(Default, Clone, Debug, PartialEq)]
+#[derive(Default, Clone, Debug)]
 pub struct Form {
     pub fieldsets: Vec<FieldSet>,
 }

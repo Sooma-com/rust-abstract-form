@@ -13,9 +13,9 @@ pub use boolean::Boolean;
 pub mod to_field;
 pub use to_field::ToField;
 
-use crate::errors::Error;
+use crate::{Validation, errors::Error};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub enum Field {
     Text(Text),
     Number(Number),
@@ -63,6 +63,16 @@ impl Field {
         }
         self
     }
+    pub fn get_label(&self) -> &str {
+        match self {
+            Field::Text(text) => &text.label,
+            Field::Number(number) => &number.label,
+            Field::Date(date) => &date.label,
+            Field::Time(time) => &time.label,
+            Field::DateTime(date_time) => &date_time.label,
+            Field::Boolean(boolean) => &boolean.label,
+        }
+    }
     pub fn get_value_as_string(&self) -> String {
         match self {
             Field::Text(text) => text.value.clone(),
@@ -83,5 +93,48 @@ impl Field {
             Field::Boolean(boolean) => boolean.value = value.parse::<bool>()?,
         };
         Ok(())
+    }
+    pub fn get_validations(&self) -> &Vec<std::sync::Arc<Box<dyn Validation>>> {
+        match self {
+            Field::Text(text) => text.get_validations(),
+            Field::Number(number) => number.get_validations(),
+            Field::Date(date) => date.get_validations(),
+            Field::Time(time) => time.get_validations(),
+            Field::DateTime(date_time) => date_time.get_validations(),
+            Field::Boolean(boolean) => boolean.get_validations(),
+        }
+    }
+    pub fn get_validations_mut(&mut self) -> &mut Vec<std::sync::Arc<Box<dyn Validation>>> {
+        match self {
+            Field::Text(text) => text.get_validations_mut(),
+            Field::Number(number) => number.get_validations_mut(),
+            Field::Date(date) => date.get_validations_mut(),
+            Field::Time(time) => time.get_validations_mut(),
+            Field::DateTime(date_time) => date_time.get_validations_mut(),
+            Field::Boolean(boolean) => boolean.get_validations_mut(),
+        }
+    }
+    pub fn add_validation(&mut self, validation: std::sync::Arc<Box<dyn Validation>>) {
+        self.get_validations_mut().push(validation);
+    }
+    pub fn validate(&self) -> Result<bool, Vec<String>> {
+        let mut errors = Vec::<String>::new();
+        for validation in self.get_validations() {
+            if let Err(error) = validation.validate(self) {
+                errors.push(error);
+            }
+        }
+        if errors.is_empty() {
+            Ok(true)
+        } else {
+            Err(errors)
+        }
+    }
+}
+impl PartialEq for Field {
+    fn eq(&self, other: &Self) -> bool {
+        self.get_tag() == other.get_tag()
+            && self.get_value_as_string() == other.get_value_as_string()
+            && self.get_label() == other.get_label()
     }
 }
