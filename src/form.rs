@@ -8,6 +8,11 @@ impl Form {
     pub fn new() -> Self {
         Self { fieldsets: vec![] }
     }
+    pub fn from_field_set(fieldset: FieldSet) -> Self {
+        Self {
+            fieldsets: vec![fieldset],
+        }
+    }
     pub fn add_control(&mut self, control: Field) -> &mut Self {
         if self.fieldsets.is_empty() {
             self.fieldsets

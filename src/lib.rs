@@ -8,6 +8,7 @@ pub use field::Field;
 pub use field::ToField;
 pub mod validation;
 pub use validation::Validation;
+pub mod renderer;
 
 #[cfg(test)]
 extern crate self as abstract_form;
