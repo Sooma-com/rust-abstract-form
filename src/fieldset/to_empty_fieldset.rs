@@ -1,38 +1,12 @@
-use crate::{Field, FieldSet, field};
+use crate::FieldSet;
+use crate::field::single_value::SingleValue;
+use std::sync::Arc;
 
 pub trait ToEmptyFieldSet {
     fn to_empty_fieldset() -> FieldSet;
 }
 
-impl ToEmptyFieldSet for String {
-    fn to_empty_fieldset() -> FieldSet {
-        FieldSet {
-            tag: "".to_string(),
-            label: "".to_string(),
-            controls: vec![Field::Text(field::Text::new(
-                "".to_string(),
-                "".to_string(),
-                "".to_string(),
-            ))],
-        }
-    }
-}
-
-impl ToEmptyFieldSet for bool {
-    fn to_empty_fieldset() -> FieldSet {
-        FieldSet {
-            tag: "".to_string(),
-            label: "".to_string(),
-            controls: vec![Field::Boolean(field::Boolean::new(
-                "".to_string(),
-                "".to_string(),
-                false,
-            ))],
-        }
-    }
-}
-
-macro_rules! impl_to_empty_fieldset_for_numeric {
+macro_rules! impl_to_empty_fieldset_for_primitive {
     ($($t:ty),*) => {
         $(
             impl ToEmptyFieldSet for $t {
@@ -40,92 +14,71 @@ macro_rules! impl_to_empty_fieldset_for_numeric {
                     FieldSet {
                         tag: "".to_string(),
                         label: "".to_string(),
-                        controls: vec![Field::Number(field::Number::new(
-                            "".to_string(),
-                            "".to_string(),
-                            0.0,
-                        ))],
+                        controls: vec![
+                            Arc::new(Box::new(SingleValue::<$t> {
+                                tag: "".to_string(),
+                                label: "".to_string(),
+                                value: Default::default(),
+                                validations: vec![],
+                            })),
+                        ]
                     }
                 }
             }
         )*
     };
 }
-
-impl_to_empty_fieldset_for_numeric!(i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, isize, usize);
-
-impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for Option<INNER> {
-    fn to_empty_fieldset() -> FieldSet {
-        INNER::to_empty_fieldset()
-    }
-}
-impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for Box<INNER> {
-    fn to_empty_fieldset() -> FieldSet {
-        INNER::to_empty_fieldset()
-    }
-}
-impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::rc::Rc<INNER> {
-    fn to_empty_fieldset() -> FieldSet {
-        INNER::to_empty_fieldset()
-    }
-}
-impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::sync::Arc<INNER> {
-    fn to_empty_fieldset() -> FieldSet {
-        INNER::to_empty_fieldset()
-    }
-}
-impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::cell::Cell<INNER> {
-    fn to_empty_fieldset() -> FieldSet {
-        INNER::to_empty_fieldset()
-    }
-}
-impl<INNER: ToEmptyFieldSet> ToEmptyFieldSet for std::cell::RefCell<INNER> {
-    fn to_empty_fieldset() -> FieldSet {
-        INNER::to_empty_fieldset()
-    }
-}
-
+impl_to_empty_fieldset_for_primitive!(
+    String, bool, i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, isize, usize
+);
 #[cfg(feature = "chrono")]
-impl ToEmptyFieldSet for chrono::NaiveDate {
+impl_to_empty_fieldset_for_primitive!(chrono::NaiveDate, chrono::NaiveTime, chrono::NaiveDateTime);
+
+impl<T> ToEmptyFieldSet for Option<T>
+where
+    T: ToEmptyFieldSet,
+{
     fn to_empty_fieldset() -> FieldSet {
-        FieldSet {
-            tag: "".to_string(),
-            label: "".to_string(),
-            controls: vec![Field::Date(field::Date::new(
-                "".to_string(),
-                "".to_string(),
-                "".to_string(),
-            ))],
-        }
+        <T as ToEmptyFieldSet>::to_empty_fieldset()
     }
 }
-
-#[cfg(feature = "chrono")]
-impl ToEmptyFieldSet for chrono::NaiveTime {
+impl<T> ToEmptyFieldSet for Box<T>
+where
+    T: ToEmptyFieldSet,
+{
     fn to_empty_fieldset() -> FieldSet {
-        FieldSet {
-            tag: "".to_string(),
-            label: "".to_string(),
-            controls: vec![Field::Time(field::Time::new(
-                "".to_string(),
-                "".to_string(),
-                "".to_string(),
-            ))],
-        }
+        <T as ToEmptyFieldSet>::to_empty_fieldset()
     }
 }
-
-#[cfg(feature = "chrono")]
-impl ToEmptyFieldSet for chrono::NaiveDateTime {
+impl<T> ToEmptyFieldSet for std::rc::Rc<T>
+where
+    T: ToEmptyFieldSet,
+{
     fn to_empty_fieldset() -> FieldSet {
-        FieldSet {
-            tag: "".to_string(),
-            label: "".to_string(),
-            controls: vec![Field::DateTime(field::DateTime::new(
-                "".to_string(),
-                "".to_string(),
-                "".to_string(),
-            ))],
-        }
+        <T as ToEmptyFieldSet>::to_empty_fieldset()
+    }
+}
+impl<T> ToEmptyFieldSet for std::sync::Arc<T>
+where
+    T: ToEmptyFieldSet,
+{
+    fn to_empty_fieldset() -> FieldSet {
+        <T as ToEmptyFieldSet>::to_empty_fieldset()
+    }
+}
+impl<T> ToEmptyFieldSet for std::cell::Cell<T>
+where
+    T: ToEmptyFieldSet,
+{
+    fn to_empty_fieldset() -> FieldSet {
+        <T as ToEmptyFieldSet>::to_empty_fieldset()
+    }
+}
+impl<T> ToEmptyFieldSet for std::cell::RefCell<T>
+where
+    T: ToEmptyFieldSet,
+{
+    fn to_empty_fieldset() -> FieldSet {
+        <T as ToEmptyFieldSet>::to_empty_fieldset()
     }
 }

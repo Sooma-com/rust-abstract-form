@@ -4,6 +4,6 @@ pub trait FieldRenderer: Send + Sync {
         form: &crate::Form,
         form_renderer: &dyn super::FormRenderer,
         fieldset: &crate::FieldSet,
-        field: &crate::Field,
+        field: &std::sync::Arc<Box<dyn crate::Field>>,
     ) -> String;
 }

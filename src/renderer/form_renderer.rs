@@ -10,17 +10,20 @@ pub trait FormRenderer {
     ) -> &mut HashMap<String, std::sync::Arc<Box<dyn FieldRenderer>>>;
     fn add_field_renderer(
         &mut self,
-        field: &crate::Field,
+        field_tag: &str,
         renderer: std::sync::Arc<Box<dyn FieldRenderer>>,
     ) {
         self.field_renderers_mut()
-            .insert(field.get_tag().to_string(), renderer);
+            .insert(field_tag.to_string(), renderer);
     }
     fn get_default_field_renderer(
         &self,
-        field: &crate::Field,
+        field: &std::sync::Arc<Box<dyn crate::Field>>,
     ) -> std::sync::Arc<Box<dyn FieldRenderer>>;
-    fn get_field_renderer(&self, field: &crate::Field) -> std::sync::Arc<Box<dyn FieldRenderer>> {
+    fn get_field_renderer(
+        &self,
+        field: &std::sync::Arc<Box<dyn crate::Field>>,
+    ) -> std::sync::Arc<Box<dyn FieldRenderer>> {
         match self.field_renderers().get(field.get_tag()) {
             Some(renderer) => renderer.clone(),
             None => self.get_default_field_renderer(field),

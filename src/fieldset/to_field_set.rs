@@ -1,38 +1,13 @@
-use crate::{Field, FieldSet};
+use crate::FieldSet;
+use crate::field::single_value::SingleValue;
+use crate::fieldset::to_empty_fieldset::ToEmptyFieldSet;
+use std::sync::Arc;
 
 pub trait ToFieldSet {
     fn to_field_set(&self) -> FieldSet;
 }
 
-impl ToFieldSet for String {
-    fn to_field_set(&self) -> FieldSet {
-        let mut result = FieldSet::new("".to_string(), "".to_string());
-        result
-            .controls
-            .push(Field::Text(crate::field::text::Text::new(
-                "".to_string(),
-                "".to_string(),
-                self.clone(),
-            )));
-        result
-    }
-}
-
-impl ToFieldSet for bool {
-    fn to_field_set(&self) -> FieldSet {
-        let mut result = FieldSet::new("".to_string(), "".to_string());
-        result
-            .controls
-            .push(Field::Boolean(crate::field::boolean::Boolean::new(
-                "".to_string(),
-                "".to_string(),
-                *self,
-            )));
-        result
-    }
-}
-
-macro_rules! impl_to_field_set_for_numeric {
+macro_rules! impl_to_field_set_for_primitive {
     ($($t:ty),*) => {
         $(
             impl ToFieldSet for $t {
@@ -40,70 +15,32 @@ macro_rules! impl_to_field_set_for_numeric {
                     let mut result = FieldSet::new("".to_string(), "".to_string());
                     result
                         .controls
-                        .push(Field::Number(crate::field::number::Number::new(
-                            "".to_string(),
-                            "".to_string(),
-                            *self as f64,
-                        )));
+                        .push(Arc::new(Box::new(SingleValue::<$t> {
+                            tag: "".to_string(),
+                            label: "".to_string(),
+                            value: self.clone(),
+                            validations: vec![],
+                        })));
                     result
                 }
             }
         )*
     };
 }
+impl_to_field_set_for_primitive!(
+    String, bool, i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, isize, usize
+);
+#[cfg(feature = "chrono")]
+impl_to_field_set_for_primitive!(chrono::NaiveDate, chrono::NaiveTime, chrono::NaiveDateTime);
 
-impl_to_field_set_for_numeric!(i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, isize, usize);
-
-impl<INNER> ToFieldSet for Option<INNER>
+impl<T> ToFieldSet for Option<T>
 where
-    INNER: ToFieldSet + Clone + Default,
+    T: ToFieldSet + ToEmptyFieldSet,
 {
     fn to_field_set(&self) -> FieldSet {
-        self.clone().unwrap_or_default().to_field_set()
-    }
-}
-
-#[cfg(feature = "chrono")]
-impl ToFieldSet for chrono::NaiveDate {
-    fn to_field_set(&self) -> FieldSet {
-        let mut result = FieldSet::new("".to_string(), "".to_string());
-        result
-            .controls
-            .push(Field::Date(crate::field::date::Date::new(
-                "".to_string(),
-                "".to_string(),
-                self.to_string(),
-            )));
-        result
-    }
-}
-
-#[cfg(feature = "chrono")]
-impl ToFieldSet for chrono::NaiveTime {
-    fn to_field_set(&self) -> FieldSet {
-        let mut result = FieldSet::new("".to_string(), "".to_string());
-        result
-            .controls
-            .push(Field::Date(crate::field::date::Date::new(
-                "".to_string(),
-                "".to_string(),
-                self.to_string(),
-            )));
-        result
-    }
-}
-
-#[cfg(feature = "chrono")]
-impl ToFieldSet for chrono::NaiveDateTime {
-    fn to_field_set(&self) -> FieldSet {
-        let mut result = FieldSet::new("".to_string(), "".to_string());
-        result
-            .controls
-            .push(Field::Date(crate::field::date::Date::new(
-                "".to_string(),
-                "".to_string(),
-                self.to_string(),
-            )));
-        result
+        match self {
+            Some(value) => value.to_field_set(),
+            None => <T as ToEmptyFieldSet>::to_empty_fieldset(),
+        }
     }
 }

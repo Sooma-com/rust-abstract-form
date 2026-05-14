@@ -10,6 +10,10 @@ pub enum Error {
     FormatConversionError { msg: String },
     #[snafu(display("Field not found: {}", msg))]
     FieldNotFound { msg: String },
+    #[snafu(display("Field set not found: {}", msg))]
+    FieldSetNotFound { msg: String },
+    #[snafu(display("Field not mutable: {}", msg))]
+    FieldNotMutable { msg: String },
 }
 error_wrap!(std::num::ParseFloatError, Error::FormatConversionError);
 error_wrap!(std::num::ParseIntError, Error::FormatConversionError);
