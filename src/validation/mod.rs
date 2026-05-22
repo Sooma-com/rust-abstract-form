@@ -3,6 +3,8 @@ use std::any::TypeId;
 use crate::Field;
 pub mod closed_single_choice;
 pub use closed_single_choice::ClosedSingleChoice;
+pub mod closed_multiple_choice;
+pub use closed_multiple_choice::ClosedMultipleChoice;
 
 pub trait Validation: std::fmt::Debug + Send + Sync
 where
