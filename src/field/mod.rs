@@ -1,5 +1,7 @@
 pub mod single_value;
 pub use single_value::SingleValue;
+pub mod concrete_single_value;
+pub use concrete_single_value::ConcreteSingleValue;
 pub mod array_value;
 pub use array_value::ArrayValue;
 pub mod to_field;
