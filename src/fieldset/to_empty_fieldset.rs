@@ -82,3 +82,22 @@ where
         <T as ToEmptyFieldSet>::to_empty_fieldset()
     }
 }
+#[cfg(feature = "hex_color")]
+impl ToEmptyFieldSet for hex_color::HexColor {
+    fn to_empty_fieldset() -> FieldSet {
+        use crate::field::ConcreteSingleValue;
+
+        FieldSet {
+            tag: "".to_string(),
+            label: "".to_string(),
+            controls: vec![Arc::new(Box::new(ConcreteSingleValue::<
+                hex_color::HexColor,
+            > {
+                tag: "".to_string(),
+                label: "".to_string(),
+                value: hex_color::HexColor::BLACK,
+                validations: vec![],
+            }))],
+        }
+    }
+}

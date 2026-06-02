@@ -6,14 +6,14 @@ use std::str::FromStr;
 use crate::{Field, Validation};
 
 #[derive(Clone, Debug)]
-pub struct ClosedSingleChoice<T>
+pub struct ClosedMultipleChoice<T>
 where
     T: std::fmt::Debug + std::fmt::Display + Clone + Send + Sync,
 {
     pub message: Option<String>,
     pub options: Vec<(T, String)>,
 }
-impl<T> ClosedSingleChoice<T>
+impl<T> ClosedMultipleChoice<T>
 where
     T: std::fmt::Debug + std::fmt::Display + Clone + Send + Sync,
 {
@@ -50,20 +50,29 @@ where
         });
     }
 }
-impl<T> Validation for ClosedSingleChoice<T>
+impl<T> Validation for ClosedMultipleChoice<T>
 where
     T: std::fmt::Debug + std::fmt::Display + Clone + Send + Sync + 'static,
 {
     fn validate(&self, value: &dyn Field) -> Result<bool, String> {
-        let string_value = value.get_value_as_string();
-        match self
-            .options
-            .iter()
-            .any(|(value, _)| value.to_string() == string_value)
-        {
-            true => Ok(true),
-            false => Err(self.message.clone().unwrap_or("Invalid option".to_string())),
+        let string_values = value
+            .get_value_as_string()
+            .split(',')
+            .map(str::to_string)
+            .collect::<Vec<String>>();
+        for string_value in string_values {
+            if !self
+                .options
+                .iter()
+                .any(|(value, _)| value.to_string() == string_value)
+            {
+                return Err(self
+                    .message
+                    .clone()
+                    .unwrap_or(format!("Invalid option: {}", string_value)));
+            }
         }
+        Ok(true)
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self
