@@ -82,6 +82,20 @@ where
         <T as ToEmptyFieldSet>::to_empty_fieldset()
     }
 }
+impl ToEmptyFieldSet for Vec<u8> {
+    fn to_empty_fieldset() -> FieldSet {
+        FieldSet {
+            tag: "".to_string(),
+            label: "".to_string(),
+            controls: vec![Arc::new(Box::new(SingleValue::<String> {
+                tag: "".to_string(),
+                label: "".to_string(),
+                value: "".to_string(),
+                validations: vec![],
+            }))],
+        }
+    }
+}
 #[cfg(feature = "hex_color")]
 impl ToEmptyFieldSet for hex_color::HexColor {
     fn to_empty_fieldset() -> FieldSet {

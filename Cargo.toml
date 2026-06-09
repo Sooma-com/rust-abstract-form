@@ -19,6 +19,7 @@ itertools = "0.14.0"
 log = "0.4.29"
 snafu = "0.9.*"
 regex = "1.12"
+base64 = "0.22"
 
 [dev-dependencies]
 abstract_form_derive = { path = "../abstract_form_derive" }

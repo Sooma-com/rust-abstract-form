@@ -69,3 +69,20 @@ macro_rules! impl_to_field_set_for_concrete_single_value {
 
 #[cfg(feature = "hex_color")]
 impl_to_field_set_for_concrete_single_value!(hex_color::HexColor);
+
+impl ToFieldSet for Vec<u8> {
+    fn to_field_set(&self) -> FieldSet {
+        use base64::Engine;
+
+        FieldSet {
+            tag: "".to_string(),
+            label: "".to_string(),
+            controls: vec![Arc::new(Box::new(SingleValue::<String> {
+                tag: "".to_string(),
+                label: "".to_string(),
+                value: base64::prelude::BASE64_STANDARD.encode(self),
+                validations: vec![],
+            }))],
+        }
+    }
+}
